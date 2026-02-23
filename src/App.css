@@ -1,0 +1,54 @@
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(to right, #141e30, #243b55);
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Card UI */
+.card {
+  background: white;
+  padding: 40px;
+  border-radius: 15px;
+  text-align: center;
+  width: 320px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Button */
+.btn {
+  padding: 15px 30px;
+  font-size: 18px;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: 0.3s;
+}
+
+/* ON state */
+.btn.on {
+  background: #e74c3c;
+}
+
+/* OFF state */
+.btn.off {
+  background: #2ecc71;
+}
+
+/* Hover effect */
+.btn:hover {
+  transform: scale(1.05);
+}
+
+/* Status text */
+.status {
+  margin-top: 25px;
+}

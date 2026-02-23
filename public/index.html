@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ESP8266 LED Control Dashboard</title>
+  <style>
+
+    body{
+      margin:0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right,#0f2027,#2c5364);
+      color:#fff;
+    }
+
+    .container{
+      padding:20px;
+    }
+
+    h1{
+      text-align:center;
+      background:#ffffff22;
+      padding:15px;
+      border-radius:10px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:20px;
+      margin-top:20px;
+    }
+
+    .card{
+      background:#ffffff15;
+      padding:15px;
+      border-radius:15px;
+      box-shadow:0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .btn{
+      padding:10px 20px;
+      border:none;
+      border-radius:8px;
+      margin:5px;
+      cursor:pointer;
+      font-weight:bold;
+    }
+
+    .on{background:green;color:white;}
+    .off{background:red;color:white;}
+
+    .log{
+      height:150px;
+      overflow-y:auto;
+      background:#00000033;
+      padding:10px;
+      border-radius:10px;
+    }
+
+    .status-box{
+      display:flex;
+      justify-content:space-between;
+      margin-top:10px;
+    }
+
+    .status{
+      background:#ffffff22;
+      padding:10px;
+      border-radius:10px;
+      width:30%;
+      text-align:center;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>⚡ ESP8266 LED Control Dashboard</h1>
+
+  <div class="grid">
+
+    <!-- LED CONTROL -->
+    <div class="card">
+      <h3>LED Control</h3>
+      <p>Status: <span id="ledStatus">OFF</span></p>
+
+      <button class="btn on" onclick="ledOn()">Turn ON</button>
+      <button class="btn off" onclick="ledOff()">Turn OFF</button>
+    </div>
+
+    <!-- STATISTICS -->
+    <div class="card">
+      <h3>Statistics</h3>
+
+      <div class="status-box">
+        <div class="status">
+          <h4>Total Turns</h4>
+          <p id="count">0</p>
+        </div>
+
+        <div class="status">
+          <h4>Uptime</h4>
+          <p>2m 12s</p>
+        </div>
+
+        <div class="status">
+          <h4>WiFi</h4>
+          <p>Connected</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEVICE INFO -->
+    <div class="card">
+      <h3>Device Info</h3>
+      <p>Board: NodeMCU</p>
+      <p>IP: 192.168.1.10</p>
+      <p>Firmware: v1.0</p>
+      <p>Mode: Active</p>
+    </div>
+
+  </div>
+
+  <!-- ACTIVITY LOG -->
+  <div class="card" style="margin-top:20px;">
+    <h3>Activity Log</h3>
+    <div class="log" id="log"></div>
+  </div>
+
+</div>
+
+<script>
+
+let count = 0;
+
+function addLog(text){
+  let log = document.getElementById("log");
+  log.innerHTML += "<p>" + text + "</p>";
+}
+
+function ledOn(){
+  document.getElementById("ledStatus").innerHTML="ON";
+  count++;
+  document.getElementById("count").innerHTML=count;
+  addLog("LED Turned ON");
+}
+
+function ledOff(){
+  document.getElementById("ledStatus").innerHTML="OFF";
+  count++;
+  document.getElementById("count").innerHTML=count;
+  addLog("LED Turned OFF");
+}
+
+</script>
+
+</body>
+</html>
