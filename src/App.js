@@ -1,56 +1,91 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set } from "firebase/database";
+import { getDatabase, ref, onValue, set } from "firebase/database";
+import "./App.css";
 
-// 🔥 Your Firebase configuration
+/* 🔥 FIREBASE CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyAYaVVi_sdgxj6i6Q7jIUQCMpKDBne-udo",
   authDomain: "esp8266ledcontrol-648f6.firebaseapp.com",
-  databaseURL:
-    "https://esp8266ledcontrol-648f6-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "esp8266ledcontrol-648f6",
+  databaseURL: "https://esp8266ledcontrol-648f6-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"esp8266ledcontrol-648f6" ,
   storageBucket: "esp8266ledcontrol-648f6.firebasestorage.app",
-  messagingSenderId: "785496335355",
-  appId: "1:785496335355:web:c7be94f44f3f7f5fc6215e",
+   messagingSenderId: "785496335355",
+   appId: "1:785496335355:web:c7be94f44f3f7f5fc6215e",
+ measurementId: "G-PEFC817338"
 };
 
-// ✅ Initialize Firebase
+/* 🔥 INITIALIZE FIREBASE */
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-function App() {
-  const [led, setLed] = useState(false);
+export default function App() {
 
-  const toggleLED = () => {
-    const newState = !led;
-    setLed(newState);
+  const [devices, setDevices] = useState({
+    device1State: 0,
+    device2State: 0,
+    buzzerState: 0,
+  });
 
-    // 🔁 Send data to Firebase
-    set(ref(db, "LED_STATUS"), newState ? "ON" : "OFF");
+  /* 📡 READ REALTIME DATA */
+  useEffect(() => {
+    const homeRef = ref(db, "home/");
+
+    onValue(homeRef, (snapshot) => {
+      if (snapshot.exists()) {
+        setDevices(snapshot.val());
+      }
+    });
+  }, []);
+
+  /* 🎛 TOGGLE FUNCTION */
+  const toggle = (device, value) => {
+    set(ref(db, "home/" + device), value);
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>🔥 ESP8266 LED Control</h1>
+    <div className="main">
+      <h1>🏠 Smart Home Dashboard</h1>
 
-      <button
-        onClick={toggleLED}
-        style={{
-          padding: "15px 30px",
-          fontSize: "18px",
-          backgroundColor: led ? "red" : "green",
-          color: "white",
-          border: "none",
-          borderRadius: "8px",
-          cursor: "pointer",
-        }}
-      >
-        {led ? "Turn OFF" : "Turn ON"}
-      </button>
+      <Device
+        name="💡 Light"
+        state={devices.device1State}
+        toggle={() =>
+          toggle("device1State", devices.device1State ? 0 : 1)
+        }
+      />
 
-      <h2>Status: {led ? "ON" : "OFF"}</h2>
+      <Device
+        name="🌀 Fan"
+        state={devices.device2State}
+        toggle={() =>
+          toggle("device2State", devices.device2State ? 0 : 1)
+        }
+      />
+
+      <Device
+        name="🔔 Buzzer"
+        state={devices.buzzerState}
+        toggle={() =>
+          toggle("buzzerState", devices.buzzerState ? 0 : 1)
+        }
+      />
     </div>
   );
 }
 
-export default App;
+/* 🔘 DEVICE CARD COMPONENT */
+function Device({ name, state, toggle }) {
+  return (
+    <div className="card">
+      <h2>{name}</h2>
+
+      <button
+        className={state ? "on" : "off"}
+        onClick={toggle}
+      >
+        {state ? "ON ✅" : "OFF ❌"}
+      </button>
+    </div>
+  );
+}

@@ -1,159 +1,123 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>ESP8266 LED Control Dashboard</title>
+  <title>Smart Home Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
-
-    body{
-      margin:0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right,#0f2027,#2c5364);
-      color:#fff;
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      text-align: center;
     }
 
-    .container{
-      padding:20px;
+    h1 {
+      padding: 20px;
     }
 
-    h1{
-      text-align:center;
-      background:#ffffff22;
-      padding:15px;
-      border-radius:10px;
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 30px;
     }
 
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap:20px;
-      margin-top:20px;
+    .card {
+      background: #1e293b;
+      padding: 25px;
+      border-radius: 15px;
     }
 
-    .card{
-      background:#ffffff15;
-      padding:15px;
-      border-radius:15px;
-      box-shadow:0 0 10px rgba(0,0,0,0.3);
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+      background: #38bdf8;
     }
 
-    .btn{
-      padding:10px 20px;
-      border:none;
-      border-radius:8px;
-      margin:5px;
-      cursor:pointer;
-      font-weight:bold;
-    }
-
-    .on{background:green;color:white;}
-    .off{background:red;color:white;}
-
-    .log{
-      height:150px;
-      overflow-y:auto;
-      background:#00000033;
-      padding:10px;
-      border-radius:10px;
-    }
-
-    .status-box{
-      display:flex;
-      justify-content:space-between;
-      margin-top:10px;
-    }
-
-    .status{
-      background:#ffffff22;
-      padding:10px;
-      border-radius:10px;
-      width:30%;
-      text-align:center;
-    }
-
+    .on { background: #16a34a; }
+    .off { background: #dc2626; }
   </style>
 </head>
 
 <body>
 
+<h1>🏠 Smart Home Automation</h1>
+
 <div class="container">
 
-  <h1>⚡ ESP8266 LED Control Dashboard</h1>
-
-  <div class="grid">
-
-    <!-- LED CONTROL -->
-    <div class="card">
-      <h3>LED Control</h3>
-      <p>Status: <span id="ledStatus">OFF</span></p>
-
-      <button class="btn on" onclick="ledOn()">Turn ON</button>
-      <button class="btn off" onclick="ledOff()">Turn OFF</button>
-    </div>
-
-    <!-- STATISTICS -->
-    <div class="card">
-      <h3>Statistics</h3>
-
-      <div class="status-box">
-        <div class="status">
-          <h4>Total Turns</h4>
-          <p id="count">0</p>
-        </div>
-
-        <div class="status">
-          <h4>Uptime</h4>
-          <p>2m 12s</p>
-        </div>
-
-        <div class="status">
-          <h4>WiFi</h4>
-          <p>Connected</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- DEVICE INFO -->
-    <div class="card">
-      <h3>Device Info</h3>
-      <p>Board: NodeMCU</p>
-      <p>IP: 192.168.1.10</p>
-      <p>Firmware: v1.0</p>
-      <p>Mode: Active</p>
-    </div>
-
+  <div class="card">
+    <h2>💡 Light</h2>
+    <button id="lightBtn">Loading...</button>
   </div>
 
-  <!-- ACTIVITY LOG -->
-  <div class="card" style="margin-top:20px;">
-    <h3>Activity Log</h3>
-    <div class="log" id="log"></div>
+  <div class="card">
+    <h2>🌀 Fan</h2>
+    <button id="fanBtn">Loading...</button>
+  </div>
+
+  <div class="card">
+    <h2>🔔 Buzzer</h2>
+    <button id="buzzerBtn">Loading...</button>
   </div>
 
 </div>
 
-<script>
+<script type="module">
 
-let count = 0;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  set
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-function addLog(text){
-  let log = document.getElementById("log");
-  log.innerHTML += "<p>" + text + "</p>";
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "YOUR_DB_URL",
+  projectId: "YOUR_PROJECT_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const lightBtn = document.getElementById("lightBtn");
+const fanBtn = document.getElementById("fanBtn");
+const buzzerBtn = document.getElementById("buzzerBtn");
+
+const lightRef = ref(db, "home/device1State");
+const fanRef = ref(db, "home/device2State");
+const buzzerRef = ref(db, "home/buzzerState");
+
+function updateButton(button, state) {
+  button.innerText = state ? "ON ✅" : "OFF ❌";
+  button.className = state ? "on" : "off";
 }
 
-function ledOn(){
-  document.getElementById("ledStatus").innerHTML="ON";
-  count++;
-  document.getElementById("count").innerHTML=count;
-  addLog("LED Turned ON");
-}
+onValue(lightRef, snap => {
+  const state = snap.val();
+  updateButton(lightBtn, state);
+  lightBtn.onclick = () => set(lightRef, state ? 0 : 1);
+});
 
-function ledOff(){
-  document.getElementById("ledStatus").innerHTML="OFF";
-  count++;
-  document.getElementById("count").innerHTML=count;
-  addLog("LED Turned OFF");
-}
+onValue(fanRef, snap => {
+  const state = snap.val();
+  updateButton(fanBtn, state);
+  fanBtn.onclick = () => set(fanRef, state ? 0 : 1);
+});
+
+onValue(buzzerRef, snap => {
+  const state = snap.val();
+  updateButton(buzzerBtn, state);
+  buzzerBtn.onclick = () => set(buzzerRef, state ? 0 : 1);
+});
 
 </script>
 
