@@ -2,41 +2,166 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>🔥 Fire Alert System</title>
-  <link rel="stylesheet" href="style.css">
+  <title>🌱 RoboSync P1 Dashboard</title>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      text-align: center;
+      background: linear-gradient(135deg, #43cea2, #185a9d);
+      color: white;
+    }
+
+    h1 {
+      padding-top: 20px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(15px);
+      padding: 25px;
+      width: 280px;
+      margin: 20px auto;
+      border-radius: 20px;
+      box-shadow: 0 0 20px black;
+      animation: float 3s infinite ease-in-out;
+    }
+
+    .moisture {
+      font-size: 40px;
+      font-weight: bold;
+    }
+
+    .pump {
+      padding: 10px;
+      border-radius: 10px;
+      background: gray;
+      margin-top: 15px;
+    }
+
+    .pump.on {
+      background: limegreen;
+      box-shadow: 0 0 20px lime;
+      animation: pulse 1s infinite;
+    }
+
+    button {
+      padding: 12px 18px;
+      margin: 10px;
+      border: none;
+      border-radius: 30px;
+      font-size: 16px;
+      cursor: pointer;
+      background: white;
+      color: black;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.1);
+    }
+
+    .active {
+      background: yellow;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 5px lime; }
+      50% { box-shadow: 0 0 25px lime; }
+      100% { box-shadow: 0 0 5px lime; }
+    }
+
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="container">
+<h1>🌱 RoboSync P1 Dashboard</h1>
 
-  <h1>🔥 Fire Alert & Security</h1>
+<div class="card">
 
-  <div id="status-light" class="status safe">
-    SAFE
-  </div>
+  <div id="moisture" class="moisture">0%</div>
 
-  <div class="gas-box">
-    <h2>Gas Level</h2>
-    <div class="progress">
-      <div id="gas-bar"></div>
-    </div>
-    <span id="gas-level">0</span>
-  </div>
+  <h3>🌡 <span id="temp">0</span> °C</h3>
+  <h3>💦 <span id="hum">0</span> %</h3>
 
-  <div class="history">
-    <h2>📜 Alert History</h2>
-    <ul id="history-log"></ul>
-  </div>
+  <div id="pump" class="pump">OFF</div>
 
 </div>
 
-<!-- ✅ Firebase Libraries -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<div>
+  <button onclick="setMode('AUTO')" id="autoBtn">AUTO</button>
+  <button onclick="setMode('MANUAL')" id="manualBtn">MANUAL</button>
+  <br>
+  <button onclick="pumpOn()">Pump ON</button>
+  <button onclick="pumpOff()">Pump OFF</button>
+</div>
 
-<!-- ✅ Your App Logic -->
-<script src="app.js"></script>
+<script>
+  // 🔥 Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAYaVVi_sdgxj6i6Q7jIUQCMpKDBne-udo",
+    authDomain: "esp8266ledcontrol-648f6.firebaseapp.com",
+    databaseURL: "https://esp8266ledcontrol-648f6-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "esp8266ledcontrol-648f6",
+    storageBucket: "esp8266ledcontrol-648f6.appspot.com",
+    messagingSenderId: "785496335355",
+    appId: "1:785496335355:web:c7be94f44f3f7f5fc6215e"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  db.ref("smart_irrigation").on("value", (snap) => {
+
+    const data = snap.val();
+
+    // Moisture color logic
+    let moisture = data.soil_moisture;
+    let color = moisture < 30 ? "red" : moisture < 60 ? "orange" : "lime";
+
+    document.getElementById("moisture").innerHTML = moisture + "%";
+    document.getElementById("moisture").style.color = color;
+
+    document.getElementById("temp").innerHTML = data.temperature;
+    document.getElementById("hum").innerHTML = data.humidity;
+
+    const pump = document.getElementById("pump");
+    pump.innerHTML = data.pump_status;
+
+    if (data.pump_status === "ON") {
+      pump.classList.add("on");
+    } else {
+      pump.classList.remove("on");
+    }
+
+    // Active mode highlight
+    document.getElementById("autoBtn").classList.toggle("active", data.mode === "AUTO");
+    document.getElementById("manualBtn").classList.toggle("active", data.mode === "MANUAL");
+
+  });
+
+  function setMode(mode) {
+    db.ref("smart_irrigation/mode").set(mode);
+  }
+
+  function pumpOn() {
+    db.ref("smart_irrigation/manual_command").set("ON");
+  }
+
+  function pumpOff() {
+    db.ref("smart_irrigation/manual_command").set("OFF");
+  }
+</script>
 
 </body>
 </html>

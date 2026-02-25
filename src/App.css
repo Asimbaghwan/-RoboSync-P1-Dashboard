@@ -1,99 +1,67 @@
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  height: 100vh;
-  background: linear-gradient(135deg, #141e30, #243b55);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
+  font-family: sans-serif;
 }
 
 .container {
   text-align: center;
-  padding: 30px;
-  width: 380px;
-  border-radius: 20px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  color: white;
+  padding-top: 30px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(15px);
-  background: rgba(255,255,255,0.05);
-  box-shadow: 0 0 40px rgba(0,0,0,0.6);
-  animation: float 4s ease-in-out infinite;
+  padding: 25px;
+  border-radius: 20px;
+  width: 280px;
+  margin: auto;
+  box-shadow: 0 0 25px rgba(0,0,0,0.3);
+  animation: float 3s infinite ease-in-out;
+}
+
+.pump {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 10px;
+  background: gray;
+}
+
+.pump.on {
+  background: limegreen;
+  box-shadow: 0 0 20px limegreen;
+  animation: pulse 1s infinite;
+}
+
+button {
+  margin: 10px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  background: white;
+  color: black;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.1);
+}
+
+.active {
+  background: yellow;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 5px lime; }
+  50% { box-shadow: 0 0 25px lime; }
+  100% { box-shadow: 0 0 5px lime; }
 }
 
 @keyframes float {
   0%,100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
-}
-
-h1 {
-  margin-bottom: 20px;
-}
-
-/* STATUS LIGHT */
-
-.status {
-  padding: 15px;
-  border-radius: 50px;
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 25px;
-  transition: 0.4s;
-}
-
-.safe {
-  background: #00ff88;
-  color: black;
-  box-shadow: 0 0 20px #00ff88;
-}
-
-.fire {
-  background: red;
-  animation: fireBlink 1s infinite;
-  box-shadow: 0 0 25px red;
-}
-
-@keyframes fireBlink {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
-
-/* GAS BAR */
-
-.gas-box {
-  margin-bottom: 25px;
-}
-
-.progress {
-  background: rgba(255,255,255,0.1);
-  border-radius: 20px;
-  overflow: hidden;
-  height: 20px;
-}
-
-#g
-as-bar {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #00ffcc, #ffea00, #ff0000);
-  transition: 0.5s;
-}
-
-/* HISTORY */
-
-.history {
-  max-height: 150px;
-  overflow-y: auto;
-  text-align: left;
-}
-
-.history ul {
-  padding: 0;
-  list-style: none;
-}
-
-.history li {
-  font-size: 14px;
-  padding: 6px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
