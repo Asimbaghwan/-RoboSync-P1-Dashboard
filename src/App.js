@@ -1,91 +1,84 @@
 import React, { useEffect, useState } from "react";
-import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue, set } from "firebase/database";
 import "./App.css";
 
-/* 🔥 FIREBASE CONFIG */
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, onValue } from "firebase/database";
+
+// 🔥 Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyAYaVVi_sdgxj6i6Q7jIUQCMpKDBne-udo",
   authDomain: "esp8266ledcontrol-648f6.firebaseapp.com",
-  databaseURL: "https://esp8266ledcontrol-648f6-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId:"esp8266ledcontrol-648f6" ,
+  databaseURL:
+    "https://esp8266ledcontrol-648f6-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "esp8266ledcontrol-648f6",
   storageBucket: "esp8266ledcontrol-648f6.firebasestorage.app",
-   messagingSenderId: "785496335355",
-   appId: "1:785496335355:web:c7be94f44f3f7f5fc6215e",
- measurementId: "G-PEFC817338"
+  messagingSenderId: "785496335355",
+  appId: "1:785496335355:web:c7be94f44f3f7f5fc6215e",
+  measurementId: "G-PEFC817338",
 };
 
-/* 🔥 INITIALIZE FIREBASE */
+// 🔥 Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const database = getDatabase(app);
 
-export default function App() {
+function App() {
+  const [fireStatus, setFireStatus] = useState(false);
+  const [gasLevel, setGasLevel] = useState(0);
+  const [history, setHistory] = useState([]);
 
-  const [devices, setDevices] = useState({
-    device1State: 0,
-    device2State: 0,
-    buzzerState: 0,
-  });
-
-  /* 📡 READ REALTIME DATA */
   useEffect(() => {
-    const homeRef = ref(db, "home/");
+    const fireRef = ref(database, "fireEvents");
 
-    onValue(homeRef, (snapshot) => {
-      if (snapshot.exists()) {
-        setDevices(snapshot.val());
-      }
+    onValue(fireRef, (snapshot) => {
+      const data = snapshot.val();
+      if (!data) return;
+
+      setFireStatus(data.fireStatus);
+      setGasLevel(data.gasLevel);
+
+      const newLog = {
+        time: new Date().toLocaleString(),
+        gas: data.gasLevel,
+        status: data.fireStatus ? "🔥 FIRE" : "✅ SAFE",
+      };
+
+      setHistory((prev) => [newLog, ...prev]);
     });
   }, []);
 
-  /* 🎛 TOGGLE FUNCTION */
-  const toggle = (device, value) => {
-    set(ref(db, "home/" + device), value);
-  };
+  const percent = Math.min((gasLevel / 1000) * 100, 100);
 
   return (
-    <div className="main">
-      <h1>🏠 Smart Home Dashboard</h1>
+    <div className="container">
+      <h1>🔥 Fire Alert & Security</h1>
 
-      <Device
-        name="💡 Light"
-        state={devices.device1State}
-        toggle={() =>
-          toggle("device1State", devices.device1State ? 0 : 1)
-        }
-      />
+      <div className={`status ${fireStatus ? "fire" : "safe"}`}>
+        {fireStatus ? "🔥 FIRE ALERT" : "✅ SAFE"}
+      </div>
 
-      <Device
-        name="🌀 Fan"
-        state={devices.device2State}
-        toggle={() =>
-          toggle("device2State", devices.device2State ? 0 : 1)
-        }
-      />
+      <div className="gas-box">
+        <h2>Gas Level</h2>
 
-      <Device
-        name="🔔 Buzzer"
-        state={devices.buzzerState}
-        toggle={() =>
-          toggle("buzzerState", devices.buzzerState ? 0 : 1)
-        }
-      />
+        <div className="progress">
+          <div className="gas-bar" style={{ width: percent + "%" }}></div>
+        </div>
+
+        <span>{gasLevel}</span>
+      </div>
+
+      <div className="history">
+        <h2>📜 Alert History</h2>
+
+        <ul>
+          {history.map((item, index) => (
+            <li key={index}>
+              {item.time} → Gas: {item.gas} → {item.status}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
 
-/* 🔘 DEVICE CARD COMPONENT */
-function Device({ name, state, toggle }) {
-  return (
-    <div className="card">
-      <h2>{name}</h2>
-
-      <button
-        className={state ? "on" : "off"}
-        onClick={toggle}
-      >
-        {state ? "ON ✅" : "OFF ❌"}
-      </button>
-    </div>
-  );
-}
+export default App;

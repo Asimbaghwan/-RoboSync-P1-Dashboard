@@ -1,125 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Smart Home Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: #0f172a;
-      color: white;
-      text-align: center;
-    }
-
-    h1 {
-      padding: 20px;
-    }
-
-    .container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      padding: 30px;
-    }
-
-    .card {
-      background: #1e293b;
-      padding: 25px;
-      border-radius: 15px;
-    }
-
-    button {
-      padding: 12px 25px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 15px;
-      background: #38bdf8;
-    }
-
-    .on { background: #16a34a; }
-    .off { background: #dc2626; }
-  </style>
+  <meta charset="UTF-8">
+  <title>🔥 Fire Alert System</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1>🏠 Smart Home Automation</h1>
-
 <div class="container">
 
-  <div class="card">
-    <h2>💡 Light</h2>
-    <button id="lightBtn">Loading...</button>
+  <h1>🔥 Fire Alert & Security</h1>
+
+  <div id="status-light" class="status safe">
+    SAFE
   </div>
 
-  <div class="card">
-    <h2>🌀 Fan</h2>
-    <button id="fanBtn">Loading...</button>
+  <div class="gas-box">
+    <h2>Gas Level</h2>
+    <div class="progress">
+      <div id="gas-bar"></div>
+    </div>
+    <span id="gas-level">0</span>
   </div>
 
-  <div class="card">
-    <h2>🔔 Buzzer</h2>
-    <button id="buzzerBtn">Loading...</button>
+  <div class="history">
+    <h2>📜 Alert History</h2>
+    <ul id="history-log"></ul>
   </div>
 
 </div>
 
-<script type="module">
+<!-- ✅ Firebase Libraries -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import {
-  getDatabase,
-  ref,
-  onValue,
-  set
-} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  databaseURL: "YOUR_DB_URL",
-  projectId: "YOUR_PROJECT_ID"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-const lightBtn = document.getElementById("lightBtn");
-const fanBtn = document.getElementById("fanBtn");
-const buzzerBtn = document.getElementById("buzzerBtn");
-
-const lightRef = ref(db, "home/device1State");
-const fanRef = ref(db, "home/device2State");
-const buzzerRef = ref(db, "home/buzzerState");
-
-function updateButton(button, state) {
-  button.innerText = state ? "ON ✅" : "OFF ❌";
-  button.className = state ? "on" : "off";
-}
-
-onValue(lightRef, snap => {
-  const state = snap.val();
-  updateButton(lightBtn, state);
-  lightBtn.onclick = () => set(lightRef, state ? 0 : 1);
-});
-
-onValue(fanRef, snap => {
-  const state = snap.val();
-  updateButton(fanBtn, state);
-  fanBtn.onclick = () => set(fanRef, state ? 0 : 1);
-});
-
-onValue(buzzerRef, snap => {
-  const state = snap.val();
-  updateButton(buzzerBtn, state);
-  buzzerBtn.onclick = () => set(buzzerRef, state ? 0 : 1);
-});
-
-</script>
+<!-- ✅ Your App Logic -->
+<script src="app.js"></script>
 
 </body>
 </html>

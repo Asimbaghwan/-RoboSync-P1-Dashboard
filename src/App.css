@@ -1,26 +1,99 @@
 body {
-  background: #0f172a;
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  height: 100vh;
+  background: linear-gradient(135deg, #141e30, #243b55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   color: white;
+}
+
+.container {
   text-align: center;
-  font-family: sans-serif;
+  padding: 30px;
+  width: 380px;
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  background: rgba(255,255,255,0.05);
+  box-shadow: 0 0 40px rgba(0,0,0,0.6);
+  animation: float 4s ease-in-out infinite;
 }
 
-.main {
-  padding: 40px;
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
-.card {
-  background: #1e293b;
-  padding: 20px;
-  margin: 20px;
-  border-radius: 15px;
+h1 {
+  margin-bottom: 20px;
 }
 
-button {
-  padding: 10px 25px;
-  font-size: 16px;
-  border: none;
-  border-radius: 10px;
-  background: #38bdf8;
-  cursor: pointer;
+/* STATUS LIGHT */
+
+.status {
+  padding: 15px;
+  border-radius: 50px;
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 25px;
+  transition: 0.4s;
+}
+
+.safe {
+  background: #00ff88;
+  color: black;
+  box-shadow: 0 0 20px #00ff88;
+}
+
+.fire {
+  background: red;
+  animation: fireBlink 1s infinite;
+  box-shadow: 0 0 25px red;
+}
+
+@keyframes fireBlink {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* GAS BAR */
+
+.gas-box {
+  margin-bottom: 25px;
+}
+
+.progress {
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  overflow: hidden;
+  height: 20px;
+}
+
+#g
+as-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00ffcc, #ffea00, #ff0000);
+  transition: 0.5s;
+}
+
+/* HISTORY */
+
+.history {
+  max-height: 150px;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.history ul {
+  padding: 0;
+  list-style: none;
+}
+
+.history li {
+  font-size: 14px;
+  padding: 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
